@@ -6,6 +6,7 @@ import { ArrowLeft, Upload, Video as VideoIcon, Play, Sparkles } from 'lucide-re
 import { DEMO_PITCHES } from '@/lib/demo-data';
 import { PitchAnalysis } from '@/lib/types';
 import { mockAnalyzePitch } from '@/lib/demo-data';
+import AnalysisDashboard from './components/AnalysisDashboard';
 
 export default function AnalyzePage() {
   const [selectedPitch, setSelectedPitch] = useState<PitchAnalysis | null>(null);
@@ -23,7 +24,6 @@ export default function AnalyzePage() {
     setIsUploading(true);
     setUploadProgress(0);
 
-    // Simulate upload progress
     const progressInterval = setInterval(() => {
       setUploadProgress(prev => {
         if (prev >= 90) {
@@ -51,14 +51,12 @@ export default function AnalyzePage() {
     }
   };
 
-  // If pitch is selected, redirect to dashboard (we'll build this next)
   if (selectedPitch) {
     return <AnalysisDashboard pitch={selectedPitch} onBack={() => setSelectedPitch(null)} />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -67,14 +65,12 @@ export default function AnalyzePage() {
               <span className="font-medium">Back to home</span>
             </Link>
             <span className="text-2xl font-bold text-black">convinco</span>
-            <div className="w-24"></div> {/* Spacer for centering */}
+            <div className="w-24"></div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Title Section */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
@@ -88,7 +84,6 @@ export default function AnalyzePage() {
           </p>
         </div>
 
-        {/* Upload Section */}
         <div className="max-w-2xl mx-auto mb-16">
           <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-300 p-12 text-center hover:border-blue-500 transition">
             <input
@@ -134,14 +129,12 @@ export default function AnalyzePage() {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="flex items-center justify-center mb-16">
           <div className="flex-1 border-t border-gray-300"></div>
           <span className="px-6 text-gray-500 font-medium">OR TRY A DEMO</span>
           <div className="flex-1 border-t border-gray-300"></div>
         </div>
 
-        {/* Demo Videos */}
         <div>
           <h2 className="text-3xl font-bold text-black text-center mb-8">
             Try with demo pitches
@@ -153,7 +146,6 @@ export default function AnalyzePage() {
                 onClick={() => handleDemoSelect(pitch)}
                 className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all overflow-hidden text-left border-2 border-transparent hover:border-blue-500"
               >
-                {/* Thumbnail */}
                 <div className="relative aspect-video bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition"></div>
                   <VideoIcon className="w-16 h-16 text-white/80 relative z-10" />
@@ -163,7 +155,6 @@ export default function AnalyzePage() {
                     </div>
                   </div>
                   
-                  {/* Engagement Badge */}
                   <div className="absolute top-4 right-4 z-20">
                     <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
                       pitch.metrics.averageEngagement > 80 
@@ -177,7 +168,6 @@ export default function AnalyzePage() {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-black mb-2 group-hover:text-blue-500 transition">
                     {pitch.title}
@@ -186,7 +176,6 @@ export default function AnalyzePage() {
                     {Math.floor(pitch.duration / 60)}:{(pitch.duration % 60).toString().padStart(2, '0')} minutes
                   </p>
                   
-                  {/* Quick Stats */}
                   <div className="flex gap-4 text-sm">
                     <div>
                       <span className="text-gray-500">Peak Moments:</span>
@@ -198,7 +187,6 @@ export default function AnalyzePage() {
                     </div>
                   </div>
 
-                  {/* Pace Indicator */}
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <span className="text-xs text-gray-500">Speaking Pace: </span>
                     <span className={`text-xs font-semibold ${
@@ -215,7 +203,6 @@ export default function AnalyzePage() {
           </div>
         </div>
 
-        {/* Info Section */}
         <div className="mt-24 bg-blue-50 rounded-2xl p-12 text-center">
           <h3 className="text-2xl font-bold text-black mb-4">
             How does Pitch Pulse work?
@@ -227,23 +214,6 @@ export default function AnalyzePage() {
           </p>
         </div>
       </main>
-    </div>
-  );
-}
-
-// Placeholder component - we'll build this next
-function AnalysisDashboard({ pitch, onBack }: { pitch: PitchAnalysis; onBack: () => void }) {
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <button onClick={onBack} className="mb-4 flex items-center gap-2 text-gray-600 hover:text-black">
-        <ArrowLeft className="w-5 h-5" />
-        Back to selection
-      </button>
-      <h1 className="text-3xl font-bold">Analysis Dashboard</h1>
-      <p className="text-gray-600 mt-2">Selected: {pitch.title}</p>
-      <p className="text-sm text-gray-500 mt-4">
-        (Dashboard components coming next...)
-      </p>
     </div>
   );
 }
