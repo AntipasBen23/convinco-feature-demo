@@ -1,260 +1,152 @@
-import Link from 'next/link';
-import { ArrowRight, Video, Zap, TrendingUp, Users } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { Upload, Sparkles } from 'lucide-react';
+import { DEMO_PITCHES } from '@/lib/demo-data';
+import { PitchAnalysis } from '@/lib/types';
+import { mockAnalyzePitch } from '@/lib/demo-data';
+import AnalysisDashboard from '@/app/analyze/components/AnalysisDashboard';
 
 export default function HomePage() {
+  const [selectedPitch, setSelectedPitch] = useState<PitchAnalysis | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleDemoSelect = (pitch: PitchAnalysis) => {
+    setSelectedPitch(pitch);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 300);
+
+    try {
+      const analysis = await mockAnalyzePitch(file);
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
+      setTimeout(() => {
+        setSelectedPitch(analysis);
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 500);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  if (selectedPitch) {
+    return <AnalysisDashboard pitch={selectedPitch} onBack={() => setSelectedPitch(null)} />;
+  }
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <span className="text-2xl font-bold text-black">convinco</span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-black transition">Features</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-black transition">How it works</a>
-              <a href="#demo" className="text-gray-600 hover:text-black transition">Demo</a>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="/analyze"
-                className="bg-black text-white px-6 py-2.5 rounded-full hover:bg-gray-800 transition font-medium"
-              >
-                Try Pitch Pulse
-              </Link>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Simple Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <Sparkles className="w-4 h-4" />
+            Pitch Pulse • Live Sentiment Analysis
           </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="pt-20 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          {/* Icon */}
-          <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-red-600 rounded-3xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition">
-              <Video className="w-12 h-12 text-white" />
-            </div>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6 leading-tight">
-            Practice your pitch.<br />
-            Get <span className="text-blue-500">real-time</span> feedback.
+          <h1 className="text-4xl font-bold text-black mb-3">
+            Practice your pitch. Get real-time feedback.
           </h1>
-
-          {/* Subheadline */}
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Transform your <span className="font-semibold text-black">sales presentation</span> into a winning performance with{' '}
-            <span className="font-semibold text-black">live AI coaching</span>.
+          <p className="text-gray-600">
+            Upload a video or try a demo to see live AI coaching in action
           </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link 
-              href="/analyze"
-              className="bg-black text-white px-8 py-4 rounded-full hover:bg-gray-800 transition font-semibold text-lg flex items-center gap-2 shadow-lg"
-            >
-              Try it yourself
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <a 
-              href="#demo"
-              className="bg-white text-black border-2 border-black px-8 py-4 rounded-full hover:bg-gray-50 transition font-semibold text-lg"
-            >
-              See demo
-            </a>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              <span>Used by 500+ sales professionals</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              <span>87% improvement in pitch scores</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              <span>Real-time analysis in seconds</span>
-            </div>
-          </div>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
-              The only tool with <span className="text-blue-500">live</span> coaching
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Unlike post-pitch analysis tools, Pitch Pulse gives you feedback while you practice—just like a real coach.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                <TrendingUp className="w-6 h-6 text-blue-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Live Sentiment Waves</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Watch engagement intensity rise and fall in real-time. Know exactly when you're losing your audience.
-              </p>
+        {/* Upload Section */}
+        <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-300 p-8 mb-8 hover:border-blue-500 transition">
+          <input
+            type="file"
+            id="video-upload"
+            accept="video/*"
+            onChange={handleFileUpload}
+            className="hidden"
+            disabled={isUploading}
+          />
+          <label htmlFor="video-upload" className="cursor-pointer block text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+              {isUploading ? (
+                <div className="animate-spin text-white text-2xl">⏳</div>
+              ) : (
+                <Upload className="w-8 h-8 text-white" />
+              )}
             </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6">
-                <Zap className="w-6 h-6 text-red-500" />
+            {isUploading ? (
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-black">Analyzing...</h3>
+                <div className="w-full max-w-md mx-auto bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-blue-500 h-full transition-all duration-300 rounded-full"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+                <p className="text-sm text-gray-600">{uploadProgress}%</p>
               </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Micro-Moment Markers</h3>
-              <p className="text-gray-600 leading-relaxed">
-                AI flags exact timestamps where attention dropped or peaked. Replay and fix problem areas instantly.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6">
-                <Video className="w-6 h-6 text-green-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Color-Coded Replay</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Green = engaging, Yellow = losing them, Red = critical. Instantly see what's working and what's not.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-                <span className="text-2xl">💡</span>
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Smart Suggestions</h3>
-              <p className="text-gray-600 leading-relaxed">
-                AI whispers coaching tips like "slow down", "add story here", "you're losing them" at the perfect moments.
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mb-6">
-                <Users className="w-6 h-6 text-yellow-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Comparison View</h3>
-              <p className="text-gray-600 leading-relaxed">
-                See your pitch side-by-side with top performers. Learn from the best in your industry.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6">
-                <span className="text-2xl">⚡</span>
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Instant Analysis</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Upload your practice pitch and get comprehensive feedback in seconds. No waiting, no complexity.
-              </p>
-            </div>
-          </div>
+            ) : (
+              <>
+                <h3 className="text-xl font-bold text-black mb-2">Upload your pitch</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  MP4, MOV, AVI supported
+                </p>
+                <div className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full font-medium hover:bg-gray-800 transition text-sm">
+                  <Upload className="w-4 h-4" />
+                  Choose file
+                </div>
+              </>
+            )}
+          </label>
         </div>
-      </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
-              How Convinco's Pitch Pulse <span className="text-blue-500">works</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Three simple steps to transform your pitch from average to exceptional.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 mx-auto">
-                1
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Record or Upload</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Practice your pitch on camera or upload an existing recording. Works with any sales presentation.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 mx-auto">
-                2
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">AI Analyzes Live</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Our AI watches like a real coach, tracking engagement, pace, tone, and body language in real-time.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 mx-auto">
-                3
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Improve & Win</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Get actionable feedback, replay problem areas, and practice until perfect. Close more deals.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section id="demo" className="py-24 bg-black text-white">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to master your pitch?
+        {/* Demo Pitches */}
+        <div>
+          <h2 className="text-xl font-bold text-black mb-4 text-center">
+            Or try a demo pitch
           </h2>
-          <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-            Join hundreds of sales professionals who've transformed their presentations with Pitch Pulse.
-          </p>
-          <Link 
-            href="/analyze"
-            className="bg-white text-black px-10 py-5 rounded-full hover:bg-gray-100 transition font-bold text-lg inline-flex items-center gap-2 shadow-xl"
-          >
-            Start analyzing now
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-          <p className="text-sm text-gray-400 mt-6">No signup required • Try with demo videos first</p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <span className="text-2xl font-bold text-black">convinco</span>
-              <p className="text-gray-500 text-sm mt-2">Pitch Pulse • A feature concept</p>
-            </div>
-            <div className="flex gap-8 text-sm text-gray-600">
-              <a href="#" className="hover:text-black transition">Privacy</a>
-              <a href="#" className="hover:text-black transition">Terms</a>
-              <a href="#" className="hover:text-black transition">Contact</a>
-            </div>
-          </div>
-          <div className="mt-8 text-center text-sm text-gray-500">
-            © 2026 Convinco. Built with ❤️ by Antipas
+          <div className="grid md:grid-cols-3 gap-6">
+            {DEMO_PITCHES.map((pitch) => (
+              <button
+                key={pitch.id}
+                onClick={() => handleDemoSelect(pitch)}
+                className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 text-left border-2 border-transparent hover:border-blue-500"
+              >
+                <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 ${
+                  pitch.metrics.averageEngagement > 80 
+                    ? 'bg-green-100 text-green-700' 
+                    : pitch.metrics.averageEngagement > 60 
+                    ? 'bg-yellow-100 text-yellow-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {pitch.metrics.averageEngagement}% Engagement
+                </div>
+                <h3 className="font-bold text-black mb-2 group-hover:text-blue-500">
+                  {pitch.title}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {Math.floor(pitch.duration / 60)}:{(pitch.duration % 60).toString().padStart(2, '0')} min
+                </p>
+              </button>
+            ))}
           </div>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
