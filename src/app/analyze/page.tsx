@@ -6,7 +6,7 @@ import { ArrowLeft, Upload, Video as VideoIcon, Play, Sparkles } from 'lucide-re
 import { DEMO_PITCHES } from '@/lib/demo-data';
 import { PitchAnalysis } from '@/lib/types';
 import { mockAnalyzePitch } from '@/lib/demo-data';
-import AnalysisDashboard from './components/AnalysisDashboard';
+import AnalysisDashboard from '@/components/AnalysisDashboard';
 
 export default function AnalyzePage() {
   const [selectedPitch, setSelectedPitch] = useState<PitchAnalysis | null>(null);

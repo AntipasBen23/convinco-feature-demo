@@ -5,7 +5,7 @@ import { Upload, Sparkles } from 'lucide-react';
 import { DEMO_PITCHES } from '@/lib/demo-data';
 import { PitchAnalysis } from '@/lib/types';
 import { mockAnalyzePitch } from '@/lib/demo-data';
-import AnalysisDashboard from '@/app/analyze/components/AnalysisDashboard';
+import AnalysisDashboard from '@/components/AnalysisDashboard';
 
 export default function HomePage() {
   const [selectedPitch, setSelectedPitch] = useState<PitchAnalysis | null>(null);
